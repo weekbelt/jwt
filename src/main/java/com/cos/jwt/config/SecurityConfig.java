@@ -1,6 +1,8 @@
 package com.cos.jwt.config;
 
 import com.cos.jwt.jwt.JwtAuthenticationFilter;
+import com.cos.jwt.jwt.JwtAuthorizationFilter;
+import com.cos.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CorsFilter corsFilter;
 
+    private final UserRepository userRepository;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -28,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .httpBasic().disable()
             .addFilter(new JwtAuthenticationFilter(authenticationManager()))   // AuthenticationManager
+            .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))   // AuthenticationManager
             .authorizeRequests()
             .antMatchers("/api/v1/user/**")
             .access("hasRole('ROLE_USER') or hasRole('ROLE_MANAGER') or hasRole('ROLE_ADMIN')")

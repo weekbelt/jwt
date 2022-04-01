@@ -2,6 +2,7 @@ package com.cos.jwt.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.cos.jwt.JwtProperties;
 import com.cos.jwt.auth.PrincipalDetails;
 import com.cos.jwt.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,11 +68,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // RSA 방식은 아니구 Hash암호방식
         String jwtToken = JWT.create()
             .withSubject(principalDetails.getUsername())
-            .withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+            .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
             .withClaim("id", principalDetails.getUser().getId())
             .withClaim("username", principalDetails.getUsername())
-            .sign(Algorithm.HMAC512("cos"));
+            .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
-        response.addHeader("Authorization", "Bearer " + jwtToken);
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
     }
 }
